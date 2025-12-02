@@ -1,6 +1,5 @@
-use std::io::Read;
 use std::path::Path;
-use std::fs::File;
+use std::fs;
 
 
 fn main() {
@@ -13,14 +12,23 @@ fn main() {
 }
 
 
-fn process_file(filename: impl AsRef<Path>) -> Vec<String> {
-    let mut file = File::open(filename).expect("file not found");
-    let mut contents = String::new();
-    let _ = file.read_to_string(&mut contents);
+fn process_file(filename: impl AsRef<Path>) -> Vec<Vec<String>> {
+    let file = fs::read_to_string(filename).expect("file not found");
+    let contents = file.strip_suffix("\n").expect("Couldn't strip newlines");
 
-    dbg!(&contents);
-    let lines: Vec<_> = contents.to_string().split(',').map(|n| n.to_string()).collect();
+    // Not proud of this nested closure. Something is probably wrong here
+    // but the output is correct.
+    let lines: Vec<_> = contents.split(',').map(|n| n.to_string()).collect();
+    let split_lines: Vec<Vec<_>> = lines.iter().map(|l|
+        l.split('-').collect::<Vec<_>>().into_iter().map(|s|
+            s.to_string()
+        ).collect()
+    ).collect();
 
-    dbg!(&lines);
-    lines
+    split_lines
+}
+
+
+fn find_invalid_ids() {
+    todo!();
 }
