@@ -4,7 +4,13 @@ use std::fs;
 
 
 fn main() {
-    process_file("day_2_input.txt");
+    let ranges = process_file("day_2_input.txt");
+    let mut total: i64 = 0;
+    for range in ranges {
+        total += find_invalid_ids(range).iter().sum::<i64>();
+    }
+
+    println!("{:?}", total);
 }
 
 
