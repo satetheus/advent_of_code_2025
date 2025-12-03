@@ -10,6 +10,8 @@ stdenv.mkDerivation {
         bacon
         pkg-config
         openssl
+        hyperfine
+        cargo-flamegraph
     ];
     buildInputs = [];
 
