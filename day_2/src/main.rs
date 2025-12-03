@@ -37,22 +37,18 @@ fn process_file(filename: impl AsRef<Path>) -> Vec<Vec<i64>> {
 
 
 fn find_invalid_ids(range: &[i64]) -> Vec<i64> {
-    // !todo theres a lot of converting between i64 & String
-    // there's no reason to have the invalid ids as i64 until
-    // they are summed.
-    let min = *range.iter().min().expect("couldn't get min");
-    let max = *range.iter().max().expect("couldn't get max");
     let mut invalids: Vec<i64> = vec![];
     let mut chunk_size: usize;
 
-    for i in min..=max {
-        if i.to_string().len() % 2 == 0 {
-            chunk_size = i.to_string().len()/2;
+    for i in range[0]..=range[1] {
+        let id = i.to_string();
+        if id.len() % 2 == 0 {
+            chunk_size = id.len()/2;
         } else {
             continue;
         }
 
-        if check_id_by_chunk(i, chunk_size) {
+        if check_id_by_chunk(&id, chunk_size) {
             invalids.push(i);
         }
     }
@@ -62,15 +58,14 @@ fn find_invalid_ids(range: &[i64]) -> Vec<i64> {
 
 
 fn find_invalid_ids_part2(range: &[i64]) -> Vec<i64> {
-    let min = *range.iter().min().expect("couldn't get min");
-    let max = *range.iter().max().expect("couldn't get max");
     let mut invalids: Vec<i64> = vec![];
 
-    for i in min..=max {
-        let chunks = get_multiples(i.to_string().len());
+    for i in range[0]..=range[1] {
+        let id = i.to_string();
+        let chunks = get_multiples(id.len());
 
         for chunk_size in chunks {
-            if check_id_by_chunk(i, chunk_size) {
+            if check_id_by_chunk(&id, chunk_size) {
                 invalids.push(i);
             }
         }
@@ -85,8 +80,8 @@ fn get_multiples(num: usize) -> Vec<usize> {
 }
 
 
-fn check_id_by_chunk(id: i64, chunk_size: usize) -> bool {
-    let test: Vec<_> = id.to_string().chars().collect();
+fn check_id_by_chunk(id: &str, chunk_size: usize) -> bool {
+    let test: Vec<_> = id.chars().collect();
     let test2 = test.chunks(chunk_size).map(|n| n.iter().collect::<String>()).collect::<Vec<_>>();
     let deduped: Vec<_> = test2.iter().unique().collect();
 
@@ -100,11 +95,11 @@ mod tests {
 
     #[test]
     fn test_check_id_by_chunk() {
-        assert!(check_id_by_chunk(11,1));
-        assert!(!check_id_by_chunk(12,1));
-        assert!(!check_id_by_chunk(1011,2));
-        assert!(check_id_by_chunk(1010,2));
-        assert!(!check_id_by_chunk(1010,1));
+        assert!(check_id_by_chunk("11",1));
+        assert!(!check_id_by_chunk("12",1));
+        assert!(!check_id_by_chunk("1011",2));
+        assert!(check_id_by_chunk("1010",2));
+        assert!(!check_id_by_chunk("1010",1));
     }
 
     #[test]
