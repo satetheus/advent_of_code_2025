@@ -6,11 +6,16 @@ use std::fs;
 fn main() {
     let ranges = process_file("day_2_input.txt");
     let mut total: i64 = 0;
-    for range in ranges {
+    for range in &ranges {
         total += find_invalid_ids(range).iter().sum::<i64>();
     }
+    println!("Part 1: {:?}", total);
 
-    println!("{:?}", total);
+    let mut total: i64 = 0;
+    for range in &ranges {
+        total += find_invalid_ids_part2(range).iter().sum::<i64>();
+    }
+    println!("Part 1: {:?}", total);
 }
 
 
@@ -31,7 +36,10 @@ fn process_file(filename: impl AsRef<Path>) -> Vec<Vec<i64>> {
 }
 
 
-fn find_invalid_ids(range: Vec<i64>) -> Vec<i64> {
+fn find_invalid_ids(range: &Vec<i64>) -> Vec<i64> {
+    // !todo theres a lot of converting between i64 & String
+    // there's no reason to have the invalid ids as i64 until
+    // they are summed.
     let min = *range.iter().min().expect("couldn't get min");
     let max = *range.iter().max().expect("couldn't get max");
     let mut invalids: Vec<i64> = vec![];
@@ -53,14 +61,13 @@ fn find_invalid_ids(range: Vec<i64>) -> Vec<i64> {
 }
 
 
-fn find_invalid_ids_part2(range: Vec<i64>) -> Vec<i64> {
+fn find_invalid_ids_part2(range: &Vec<i64>) -> Vec<i64> {
     let min = *range.iter().min().expect("couldn't get min");
     let max = *range.iter().max().expect("couldn't get max");
     let mut invalids: Vec<i64> = vec![];
 
     for i in min..=max {
         let chunks = get_multiples(i.to_string().len());
-        dbg!(&chunks);
 
         for chunk_size in chunks {
             if check_id_by_chunk(i, chunk_size) {
@@ -109,29 +116,28 @@ mod tests {
 
     #[test]
     fn test_find_invalid_ids() {
-        assert_eq!(find_invalid_ids(vec![11,22]), vec![11,22]);
-        assert_eq!(find_invalid_ids(vec![95,115]), vec![99]);
-        assert_eq!(find_invalid_ids(vec![998,1012]), vec![1010]);
-        assert_eq!(find_invalid_ids(vec![1188511880,1188511890]), vec![1188511885]);
-        assert_eq!(find_invalid_ids(vec![222220,222224]), vec![222222]);
-        assert_eq!(find_invalid_ids(vec![1698522,1698528]), vec![]);
-        assert_eq!(find_invalid_ids(vec![446443,446449]), vec![446446]);
-        assert_eq!(find_invalid_ids(vec![38593856,38593862]), vec![38593859]);
-        assert_eq!(find_invalid_ids(vec![2121212118,2121212124]), vec![]);
+        assert_eq!(find_invalid_ids(&vec![11,22]), vec![11,22]);
+        assert_eq!(find_invalid_ids(&vec![95,115]), vec![99]);
+        assert_eq!(find_invalid_ids(&vec![998,1012]), vec![1010]);
+        assert_eq!(find_invalid_ids(&vec![1188511880,1188511890]), vec![1188511885]);
+        assert_eq!(find_invalid_ids(&vec![222220,222224]), vec![222222]);
+        assert_eq!(find_invalid_ids(&vec![1698522,1698528]), vec![]);
+        assert_eq!(find_invalid_ids(&vec![446443,446449]), vec![446446]);
+        assert_eq!(find_invalid_ids(&vec![38593856,38593862]), vec![38593859]);
+        assert_eq!(find_invalid_ids(&vec![2121212118,2121212124]), vec![]);
     }
 
     #[test]
     fn test_find_invalid_ids_part2() {
-        assert_eq!(find_invalid_ids_part2(vec![11,22]), vec![11,22]);
-        assert_eq!(find_invalid_ids_part2(vec![95,115]), vec![99,111]);
-        assert_eq!(find_invalid_ids_part2(vec![998,1012]), vec![999,1010]);
-        assert_eq!(find_invalid_ids_part2(vec![1188511880,1188511890]), vec![1188511885]);
-        assert_eq!(find_invalid_ids_part2(vec![222220,222224]), vec![222222]);
-        assert_eq!(find_invalid_ids_part2(vec![1698522,1698528]), vec![]);
-        assert_eq!(find_invalid_ids_part2(vec![446443,446449]), vec![446446]);
-        assert_eq!(find_invalid_ids_part2(vec![38593856,38593862]), vec![38593859]);
-        assert_eq!(find_invalid_ids_part2(vec![2121212118,2121212124]), vec![2121212121]);
-
+        assert_eq!(find_invalid_ids_part2(&vec![11,22]), vec![11,22]);
+        assert_eq!(find_invalid_ids_part2(&vec![95,115]), vec![99,111]);
+        assert_eq!(find_invalid_ids_part2(&vec![998,1012]), vec![999,1010]);
+        assert_eq!(find_invalid_ids_part2(&vec![1188511880,1188511890]), vec![1188511885]);
+        assert_eq!(find_invalid_ids_part2(&vec![222220,222224]), vec![222222]);
+        assert_eq!(find_invalid_ids_part2(&vec![1698522,1698528]), vec![]);
+        assert_eq!(find_invalid_ids_part2(&vec![446443,446449]), vec![446446]);
+        assert_eq!(find_invalid_ids_part2(&vec![38593856,38593862]), vec![38593859]);
+        assert_eq!(find_invalid_ids_part2(&vec![2121212118,2121212124]), vec![2121212121]);
     }
 
     #[test]
