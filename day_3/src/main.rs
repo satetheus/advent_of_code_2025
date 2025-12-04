@@ -13,39 +13,45 @@ fn process_file(filename: impl AsRef<Path>) -> Vec<String> {
 }
 
 
-fn get_joltage(battery: String) -> i32 {
-    let mut max_digit = '0';
-    let mut max_digit_index = 0;
+fn get_joltage(battery: String, count: usize) -> i64 {
+    let mut total_num = "".to_string();
     let digits = battery.chars().collect::<Vec<_>>();
+    let mut previous_max_index = 0;
 
-    for (i, digit) in digits.iter().enumerate().take(digits.len() - 1) {
-        if *digit > max_digit {
-            max_digit = *digit;
-            max_digit_index = i;
+    for position in 0..count {
+        let mut max_digit = '0';
+        let mut max_digit_index = 0;
+        for (i, digit) in digits.iter().enumerate() {
+            if i <= previous_max_index && !(position == 0 && i == 0) { continue };
+            if i > digits.len()-(count-position) { continue };
+            if *digit > max_digit {
+                max_digit = *digit;
+                max_digit_index = i;
+            }
         }
+        previous_max_index = max_digit_index;
+        total_num.push(max_digit);
     }
 
-    let mut next_max_digit = '0';
-    for digit in digits.iter().skip(max_digit_index+1) {
-        if *digit > next_max_digit {
-            next_max_digit = *digit;
-        }
-    }
-
-    (max_digit.to_string()+&next_max_digit.to_string())
-        .parse::<i32>().expect("not a number")
+    total_num.parse::<i64>().expect("not a number")
 }
 
 
 fn main() {
     let input = process_file("day_3_input.txt");
-    let mut total = 0;
+    let mut total_part1 = 0;
+    let mut total_part2 = 0;
 
-    for line in input {
-        total += get_joltage(line);
+    for line in input.clone() {
+        total_part1 += get_joltage(line, 2);
     }
 
-    println!("{}", total);
+    for line in input {
+        total_part2 += get_joltage(line, 12);
+    }
+
+    println!("{}", total_part1);
+    println!("{}", total_part2);
 }
 
 
@@ -55,9 +61,17 @@ mod tests {
 
     #[test]
     fn test_get_joltage() {
-        assert_eq!(get_joltage("987654321111111".to_string()), 98);
-        assert_eq!(get_joltage("811111111111119".to_string()), 89);
-        assert_eq!(get_joltage("234234234234278".to_string()), 78);
-        assert_eq!(get_joltage("818181911112111".to_string()), 92);
+        assert_eq!(get_joltage("987654321111111".to_string(),2), 98);
+        assert_eq!(get_joltage("811111111111119".to_string(),2), 89);
+        assert_eq!(get_joltage("234234234234278".to_string(),2), 78);
+        assert_eq!(get_joltage("818181911112111".to_string(),2), 92);
+    }
+
+    #[test]
+    fn test_get_joltage_part2() {
+        assert_eq!(get_joltage("987654321111111".to_string(),12), 987654321111);
+        assert_eq!(get_joltage("811111111111119".to_string(),12), 811111111119);
+        assert_eq!(get_joltage("234234234234278".to_string(),12), 434234234278);
+        assert_eq!(get_joltage("818181911112111".to_string(),12), 888911112111);
     }
 }
