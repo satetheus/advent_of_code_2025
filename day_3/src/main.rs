@@ -1,8 +1,15 @@
 use std::path::Path;
+use std::fs::File;
+use std::io::{BufReader,BufRead};
 
 
-fn process_file(file: &Path) {
-    todo!();
+fn process_file(filename: impl AsRef<Path>) -> Vec<String> {
+    let file = File::open(filename).expect("file not found");
+    let contents = BufReader::new(file);
+
+    contents.lines()
+        .map(|n| n.expect("couldn't parse line"))
+        .collect()
 }
 
 
@@ -31,7 +38,14 @@ fn get_joltage(battery: String) -> i32 {
 
 
 fn main() {
-    todo!();
+    let input = process_file("day_3_input.txt");
+    let mut total = 0;
+
+    for line in input {
+        total += get_joltage(line);
+    }
+
+    println!("{}", total);
 }
 
 
