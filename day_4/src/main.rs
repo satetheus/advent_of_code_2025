@@ -6,8 +6,21 @@ use std::path::Path;
 
 fn main() {
     let file = process_file("day_4_input.txt");
-    let count = count_from_state(file);
-    println!("{}", count);
+    let mut previous_state = file.clone();
+
+    let (count_part1, _) = count_from_state(file);
+    println!("{}", count_part1);
+
+    let mut total = 0;
+    loop {
+        let (count, new_state) = count_from_state(previous_state.clone());
+        if new_state == previous_state {
+            break
+        }
+        total += count;
+        previous_state = new_state;
+    }
+    println!("{}", total);
 }
 
 
@@ -31,8 +44,9 @@ fn safe_add(one: usize, two: usize, max: usize) -> usize {
 }
 
 
-fn count_from_state(input: Vec<Vec<char>>) -> i32 {
+fn count_from_state(input: Vec<Vec<char>>) -> (i32,Vec<Vec<char>>) {
     let mut total: i32 = 0;
+    let mut output = input.clone();
     for (i, row) in input.iter().enumerate() {
         for (j, item) in row.iter().enumerate() {
             if *item == '@' {
@@ -46,13 +60,14 @@ fn count_from_state(input: Vec<Vec<char>>) -> i32 {
                 }
 
                 if window.into_iter().filter(|n| *n == '@').collect::<Vec<char>>().len() < 5 {
+                    output[i][j] = 'x';
                     total += 1;
                 }
             }
         }
     }
 
-    total
+    (total, output)
 }
 
 
@@ -72,6 +87,20 @@ mod tests {
 @.@@@.@@@@
 .@@@@@@@@.
 @.@.@@@.@.".split("\n").map(|n| n.chars().collect()).collect();
-        assert_eq!(count_from_state(input), 13);
+        assert_eq!(count_from_state(input), (13,
+                vec![
+                vec!['.','.','x','x','.','x','x','@','x','.'],
+                vec!['x','@','@','.','@','.','@','.','@','@'],
+                vec!['@','@','@','@','@','.','x','.','@','@'],
+                vec!['@','.','@','@','@','@','.','.','@','.'],
+                vec!['x','@','.','@','@','@','@','.','@','x'],
+                vec!['.','@','@','@','@','@','@','@','.','@'],
+                vec!['.','@','.','@','.','@','.','@','@','@'],
+                vec!['x','.','@','@','@','.','@','@','@','@'],
+                vec!['.','@','@','@','@','@','@','@','@','.'],
+                vec!['x','.','x','.','@','@','@','.','x','.'],
+                ]
+            )
+        );
     }
 }
