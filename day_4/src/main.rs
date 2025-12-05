@@ -1,4 +1,3 @@
-use std::cmp::min;
 use std::io::{BufReader,BufRead};
 use std::fs::File;
 use std::path::Path;
@@ -34,36 +33,30 @@ fn process_file(filename: impl AsRef<Path>) -> Vec<Vec<char>> {
 }
 
 
-fn safe_sub(one: usize, two: usize) -> usize {
-    one.checked_sub(two).unwrap_or(0)
-}
-
-
-fn safe_add(one: usize, two: usize, max: usize) -> usize {
-    min(one+two,max)
-}
-
-
-fn count_from_state(input: Vec<Vec<char>>) -> (i32,Vec<Vec<char>>) {
-    let mut total: i32 = 0;
-    let mut output = input.clone();
+fn count_from_state(input: Vec<Vec<char>>) -> (usize,Vec<Vec<char>>) {
+    let window_ind: [[isize;2];8] = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    let mut total: usize = 0;
+    let mut output = vec![vec![' ';input[0].len()];input.len()];
     for (i, row) in input.iter().enumerate() {
         for (j, item) in row.iter().enumerate() {
+            let mut window = vec![];
             if *item == '@' {
-                let mut window: Vec<char> = vec![];
-                if (i as i32 - 1) >= 0 {
-                    window.append(&mut input[safe_sub(i,1)][safe_sub(j,1)..=safe_add(j,1,row.len()-1)].to_vec());
+                for index in window_ind {
+                    if i as isize + index[0] < 0 || i as isize + index[0] > input.len() as isize-1 {
+                        continue
+                    }
+                    if j as isize + index[1] < 0 || j as isize + index[1] > row.len() as isize-1 {
+                        continue
+                    }
+                    window.push(input[(i as isize+index[0]) as usize][(j as isize+index[1]) as usize]);
                 }
-                window.append(&mut input[i][safe_sub(j,1)..=safe_add(j,1,row.len()-1)].to_vec());
-                if (i + 1) < input.len() {
-                    window.append(&mut input[safe_add(i,1,input.len()-1)][safe_sub(j,1)..=safe_add(j,1,row.len()-1)].to_vec());
-                }
-
-                if window.into_iter().filter(|n| *n == '@').collect::<Vec<char>>().len() < 5 {
-                    output[i][j] = 'x';
+                if window.iter().filter(|n| **n == '@').count() < 4 {
                     total += 1;
+                    output[i][j] = 'x';
+                    continue
                 }
             }
+            output[i][j] = input[i][j];
         }
     }
 
