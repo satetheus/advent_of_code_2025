@@ -40,25 +40,28 @@ fn count_from_state(input: Vec<Vec<char>>) -> (usize,Vec<Vec<char>>) {
     for (i, row) in input.iter().enumerate() {
         for (j, item) in row.iter().enumerate() {
             let mut count = 0;
-            if *item == '@' {
-                for index in window_ind {
-                    let wind_row = input.get((i as isize+index[0]) as usize);
-                    if let Some(safe_row) = wind_row {
-                        let wind_item = safe_row.get((j as isize+index[1]) as usize);
-                        if let Some(safe_item) = wind_item {
-                            if *safe_item == '@' {
-                                count += 1;
-                            }
-                        }
-                    }
-                }
-                if count < 4 {
-                    total += 1;
-                    output[i][j] = 'x';
+            if *item != '@' {
+                output[i][j] = *item;
+                continue
+            }
+            for index in window_ind {
+                let wind_row = input.get((i as isize+index[0]) as usize);
+                if let None = wind_row {
                     continue
                 }
+                let wind_item = wind_row.expect("bad logic?").get((j as isize+index[1]) as usize);
+                if let Some(safe_item) = wind_item {
+                    if *safe_item == '@' {
+                        count += 1;
+                    }
+                }
             }
-            output[i][j] = input[i][j];
+            if count < 4 {
+                total += 1;
+                output[i][j] = 'x';
+                continue
+            }
+            output[i][j] = *item;
         }
     }
 
