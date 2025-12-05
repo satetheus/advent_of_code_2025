@@ -5,16 +5,18 @@ use std::path::Path;
 
 
 fn main() {
-    println!("Hello, world!");
+    let file = process_file("day_4_input.txt");
+    let count = count_from_state(file);
+    println!("{}", count);
 }
 
 
-fn process_file(filename: impl AsRef<Path>) -> Vec<String> {
+fn process_file(filename: impl AsRef<Path>) -> Vec<Vec<char>> {
     let file = File::open(filename).expect("file not found");
     let contents = BufReader::new(file);
 
     contents.lines()
-        .map(|n| n.expect("couldn't parse line"))
+        .map(|n| n.expect("couldn't parse line").chars().collect())
         .collect()
 }
 
@@ -39,21 +41,13 @@ fn count_from_state(input: Vec<Vec<char>>) -> i32 {
                     window.append(&mut input[safe_sub(i,1)][safe_sub(j,1)..=safe_add(j,1,row.len()-1)].to_vec());
                 }
                 window.append(&mut input[i][safe_sub(j,1)..=safe_add(j,1,row.len()-1)].to_vec());
-                if (i + 1) <= input.len() {
+                if (i + 1) < input.len() {
                     window.append(&mut input[safe_add(i,1,input.len()-1)][safe_sub(j,1)..=safe_add(j,1,row.len()-1)].to_vec());
                 }
 
-                //dbg!(&window.into_iter().filter(|n| *n == '@').collect::<Vec<char>>());
                 if window.into_iter().filter(|n| *n == '@').collect::<Vec<char>>().len() < 5 {
                     total += 1;
                 }
-                /*
-                dbg!(&input[safe_sub(i,1)..=safe_add(i,1,input.len())]
-                    .into_iter().map(
-                        |r| r[safe_sub(j,1)..=safe_add(j,1,row.len())]
-                    ).collect::<Vec<char>>()
-                );
-                */
             }
         }
     }
