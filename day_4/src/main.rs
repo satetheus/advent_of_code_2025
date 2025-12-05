@@ -39,18 +39,20 @@ fn count_from_state(input: Vec<Vec<char>>) -> (usize,Vec<Vec<char>>) {
     let mut output = vec![vec![' ';input[0].len()];input.len()];
     for (i, row) in input.iter().enumerate() {
         for (j, item) in row.iter().enumerate() {
-            let mut window = vec![];
+            let mut count = 0;
             if *item == '@' {
                 for index in window_ind {
-                    if i as isize + index[0] < 0 || i as isize + index[0] > input.len() as isize-1 {
-                        continue
+                    let wind_row = input.get((i as isize+index[0]) as usize);
+                    if let Some(safe_row) = wind_row {
+                        let wind_item = safe_row.get((j as isize+index[1]) as usize);
+                        if let Some(safe_item) = wind_item {
+                            if *safe_item == '@' {
+                                count += 1;
+                            }
+                        }
                     }
-                    if j as isize + index[1] < 0 || j as isize + index[1] > row.len() as isize-1 {
-                        continue
-                    }
-                    window.push(input[(i as isize+index[0]) as usize][(j as isize+index[1]) as usize]);
                 }
-                if window.iter().filter(|n| **n == '@').count() < 4 {
+                if count < 4 {
                     total += 1;
                     output[i][j] = 'x';
                     continue
