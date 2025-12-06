@@ -72,7 +72,6 @@ fn get_fresh_ids(ranges: Vec<[u128;2]>) -> u128 {
 
     let totals: u128 = lows.into_iter().zip(highs).filter(|(l,h)| *l != 0 || *h != 0).map(|(l,h)| 1 + h - l).sum::<u128>();
 
-    //ids.len()
     totals
 }
 
@@ -121,6 +120,40 @@ mod tests {
         assert_eq!(get_fresh_ids(vec![[1,10],[12,20],[9,11]]), 20);
         assert_eq!(get_fresh_ids(vec![[1,3],[3,5]]), 5);
         assert_eq!(get_fresh_ids(vec![[3,5],[10,14],[16,20],[12,18],[13,14],[13,13]]), 14);
+        assert_eq!(get_fresh_ids(vec![[1,5],[4,10],[5,6]]), 10);
+        assert_eq!(get_fresh_ids(vec![[1,1],[3,3],[1,2],[5,5]]), 4);
+        assert_eq!(get_fresh_ids(vec![[3,3],[3,10],[3,4],[4,5],[5,14]]), 12);
+        assert_eq!(get_fresh_ids(vec![[1,11],[2,11]]), 11);
+    }
+
+    #[test]
+    fn test_get_fresh_ids_from_file() {
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_1.txt").0), 14);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_2.txt").0), 10);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_3.txt").0), 10);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_4.txt").0), 5);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_5.txt").0), 5);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_6.txt").0), 13);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_7.txt").0), 8495185314619);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_8.txt").0), 11);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_9.txt").0), 11);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_10.txt").0), 11);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_11.txt").0), 11);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_12.txt").0), 105);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_13.txt").0), 202);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_14.txt").0), 2);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_15.txt").0), 100);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_16.txt").0), 30);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_17.txt").0), 101);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_18.txt").0), 11);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_19.txt").0), 16);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_20.txt").0), 1);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_21.txt").0), 8);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_22.txt").0), 20);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_23.txt").0), 5);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_24.txt").0), 14);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_25.txt").0), 10);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_26.txt").0), 4);
+        assert_eq!(get_fresh_ids(process_file("test_data/test_data_27.txt").0), 12);
     }
 }
-
