@@ -3,7 +3,7 @@ use std::fs::File;
 use std::path::Path;
 
 
-fn process_file(filename: impl AsRef<Path>) -> (Vec<[i128;2]>, Vec<i128>) {
+fn process_file(filename: impl AsRef<Path>) -> (Vec<[u128;2]>, Vec<u128>) {
     let file = File::open(filename).expect("file not found");
     let contents = BufReader::new(file);
 
@@ -11,19 +11,19 @@ fn process_file(filename: impl AsRef<Path>) -> (Vec<[i128;2]>, Vec<i128>) {
         .map(|n| n.expect("couldn't parse line"))
         .collect();
     let blank = lines.iter().position(|n| n.is_empty()).expect("couldn't find blank line");
-    let ranges: Vec<[i128;2]> = lines[0..blank].iter()
+    let ranges: Vec<[u128;2]> = lines[0..blank].iter()
         .map(|n| {
-            let parts: Vec<i128> = n.split('-').filter_map(|i| Some(i.parse::<i128>().expect("not a number")))
-            .collect::<Vec<i128>>();
+            let parts: Vec<u128> = n.split('-').filter_map(|i| Some(i.parse::<u128>().expect("not a number")))
+            .collect::<Vec<u128>>();
             [parts[0],parts[1]]
         }).collect();
-    let ids: Vec<i128> = lines[blank+1..].iter().map(|n| n.parse().expect("not a number")).collect();
+    let ids: Vec<u128> = lines[blank+1..].iter().map(|n| n.parse().expect("not a number")).collect();
 
     (ranges,ids)
 }
 
 
-fn count_fresh((ranges, ids): (Vec<[i128;2]>, Vec<i128>)) -> i32 {
+fn count_fresh((ranges, ids): (Vec<[u128;2]>, Vec<u128>)) -> i32 {
     let mut total = 0;
     for id in ids {
         for range in &ranges {
@@ -38,8 +38,8 @@ fn count_fresh((ranges, ids): (Vec<[i128;2]>, Vec<i128>)) -> i32 {
 }
 
 
-fn get_fresh_ids(ranges: Vec<[i128;2]>) -> i128 {
-    let (mut lows, mut highs): (Vec<i128>, Vec<i128>) = ranges.iter().map(|n| (n[0],n[1])).unzip();
+fn get_fresh_ids(ranges: Vec<[u128;2]>) -> u128 {
+    let (mut lows, mut highs): (Vec<u128>, Vec<u128>) = ranges.iter().map(|n| (n[0],n[1])).unzip();
 
     for (i, _low) in lows.clone().iter().enumerate() {
         for low_i in 0..lows.len()-1 {
@@ -70,7 +70,7 @@ fn get_fresh_ids(ranges: Vec<[i128;2]>) -> i128 {
         }
     }
 
-    let totals: i128 = lows.into_iter().zip(highs).filter(|(l,h)| *l != 0 || *h != 0).map(|(l,h)| 1 + h - l).sum::<i128>();
+    let totals: u128 = lows.into_iter().zip(highs).filter(|(l,h)| *l != 0 || *h != 0).map(|(l,h)| 1 + h - l).sum::<u128>();
 
     //ids.len()
     totals
