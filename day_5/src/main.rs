@@ -40,20 +40,20 @@ fn count_fresh((ranges, ids): (Vec<[u128;2]>, Vec<u128>)) -> i32 {
 
 fn get_fresh_ids(ranges: Vec<[u128;2]>) -> u128 {
     let (mut lows, mut highs): (Vec<u128>, Vec<u128>) = ranges.iter().map(|n| (n[0],n[1])).unzip();
+    let mut old_lows = lows.clone();
+    let mut old_highs = highs.clone();
 
-    for (a_ind, _) in lows.clone().iter().enumerate() {
-        for b_ind in 0..lows.len()-1 {
+    loop {
+        for i in 0..lows.len()*lows.len() {
+            let a_ind = i/lows.len();
+            let b_ind = i%lows.len();
+
             if b_ind == a_ind {
                 continue
             }
             if lows[a_ind] <= lows[b_ind] && highs[b_ind] <= highs[a_ind] {
                 lows[b_ind] = 0;
                 highs[b_ind] = 0;
-                continue
-            }
-            if lows[b_ind] <= lows[a_ind] && highs[a_ind] <= highs[b_ind] {
-                lows[a_ind] = 0;
-                highs[a_ind] = 0;
                 continue
             }
             if lows[a_ind] <= lows[b_ind] && lows[b_ind] <= highs[a_ind] {
@@ -68,6 +68,11 @@ fn get_fresh_ids(ranges: Vec<[u128;2]>) -> u128 {
                 lows[b_ind] = 0;
             }
         }
+        if old_lows == lows && old_highs == highs {
+            break
+        }
+        old_lows = lows.clone();
+        old_highs = highs.clone();
     }
 
     let totals: u128 = lows.into_iter().zip(highs).filter(|(l,h)| *l != 0 || *h != 0).map(|(l,h)| 1 + h - l).sum::<u128>();
@@ -122,7 +127,7 @@ mod tests {
         assert_eq!(get_fresh_ids(vec![[3,5],[10,14],[16,20],[12,18],[13,14],[13,13]]), 14);
         assert_eq!(get_fresh_ids(vec![[1,5],[4,10],[5,6]]), 10);
         assert_eq!(get_fresh_ids(vec![[1,1],[3,3],[1,2],[5,5]]), 4);
-        assert_eq!(get_fresh_ids(vec![[3,3],[3,10],[3,4],[4,5],[5,14]]), 12);
+        assert_eq!(get_fresh_ids(vec![[3,3],[3,10],[3,4],[4,5],[5,14],[1,1]]), 13);
         assert_eq!(get_fresh_ids(vec![[1,11],[2,11]]), 11);
     }
 
