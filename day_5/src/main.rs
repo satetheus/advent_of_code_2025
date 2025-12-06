@@ -41,31 +41,31 @@ fn count_fresh((ranges, ids): (Vec<[u128;2]>, Vec<u128>)) -> i32 {
 fn get_fresh_ids(ranges: Vec<[u128;2]>) -> u128 {
     let (mut lows, mut highs): (Vec<u128>, Vec<u128>) = ranges.iter().map(|n| (n[0],n[1])).unzip();
 
-    for (i, _low) in lows.clone().iter().enumerate() {
-        for low_i in 0..lows.len()-1 {
-            if low_i == i {
+    for (a_ind, _) in lows.clone().iter().enumerate() {
+        for b_ind in 0..lows.len()-1 {
+            if b_ind == a_ind {
                 continue
             }
-            if lows[i] <= lows[low_i] && highs[low_i] <= highs[i] {
-                lows[low_i] = 0;
-                highs[low_i] = 0;
+            if lows[a_ind] <= lows[b_ind] && highs[b_ind] <= highs[a_ind] {
+                lows[b_ind] = 0;
+                highs[b_ind] = 0;
                 continue
             }
-            if lows[low_i] <= lows[i] && highs[i] <= highs[low_i] {
-                lows[i] = 0;
-                highs[i] = 0;
+            if lows[b_ind] <= lows[a_ind] && highs[a_ind] <= highs[b_ind] {
+                lows[a_ind] = 0;
+                highs[a_ind] = 0;
                 continue
             }
-            if lows[i] <= lows[low_i] && lows[low_i] <= highs[i] {
-                lows[low_i] = 0;
-                highs[i] = highs[low_i];
-                highs[low_i] = 0;
+            if lows[a_ind] <= lows[b_ind] && lows[b_ind] <= highs[a_ind] {
+                lows[b_ind] = 0;
+                highs[a_ind] = highs[b_ind];
+                highs[b_ind] = 0;
                 continue
             }
-            if lows[i] <= highs[low_i] && highs[low_i] <= highs[i] {
-                highs[low_i] = 0;
-                lows[i] = lows[low_i];
-                lows[low_i] = 0;
+            if lows[a_ind] <= highs[b_ind] && highs[b_ind] <= highs[a_ind] {
+                highs[b_ind] = 0;
+                lows[a_ind] = lows[b_ind];
+                lows[b_ind] = 0;
             }
         }
     }
