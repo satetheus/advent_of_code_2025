@@ -5,8 +5,10 @@ use std::path::Path;
 
 fn main() {
     let input = process_file("day_6_input.txt");
-    let part_1_output = do_operations(input);
+    let part_1_output = do_operations(input.clone());
     println!("{:?}", part_1_output);
+    let part_2_output = do_wonky_operations(input);
+    println!("{:?}", part_2_output);
 }
 
 
@@ -64,11 +66,25 @@ fn do_wonky_operations(input: Vec<String>) -> i64 {
         operators.push(set.pop().expect("no operator found"));
         numbers.push(set.iter().filter(|n| **n != ' ').collect::<String>().parse().unwrap_or(0));
     }
-    dbg!(&numbers,&operators);
 
     let mut action = ' ';
+    let mut op_total = 0;
     for (i, operator) in operators.iter().enumerate() {
-        if *operator != ' ' { action = *operator; }
+        if numbers[i] == 0 { continue }
+        if *operator != ' ' {
+            action = *operator;
+            total += op_total;
+            if *operator == '+' { op_total = 0; }
+            else { op_total = 1; }
+        }
+
+        if action == '+' {
+            op_total += numbers[i];
+        } else {
+            op_total *= numbers[i];
+        }
+
+        if i == operators.len()-1 { total += op_total; }
     }
 
     total
