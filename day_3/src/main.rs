@@ -1,16 +1,4 @@
-use std::path::Path;
-use std::fs::File;
-use std::io::{BufReader,BufRead};
-
-
-fn process_file(filename: impl AsRef<Path>) -> Vec<String> {
-    let file = File::open(filename).expect("file not found");
-    let contents = BufReader::new(file);
-
-    contents.lines()
-        .map(|n| n.expect("couldn't parse line"))
-        .collect()
-}
+use utils::process_file;
 
 
 fn get_joltage(battery: String, count: usize) -> i64 {

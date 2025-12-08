@@ -1,6 +1,4 @@
-use std::io::{BufReader,BufRead};
-use std::fs::File;
-use std::path::Path;
+use utils::{process_file,transpose};
 
 
 fn main() {
@@ -9,27 +7,6 @@ fn main() {
     println!("{}", part_1);
     let part_2 = run_number_laser(input);
     println!("{}", part_2);
-}
-
-
-fn process_file(filename: impl AsRef<Path>) -> Vec<String> {
-    let file = File::open(filename).expect("file not found");
-    let contents = BufReader::new(file);
-
-    contents.lines()
-        .map(|n| n.expect("couldn't parse line"))
-        .collect::<Vec<String>>()
-}
-
-
-fn transpose<T>(input: Vec<Vec<T>>) -> Vec<Vec<T>> {
-    let len = input[0].len();
-    let mut iters: Vec<_> = input.into_iter().map(|n| n.into_iter()).collect();
-    (0..len)
-        .map(|_| {
-            iters.iter_mut().map(|n| n.next().expect("couldn't parse")).collect::<Vec<T>>()
-        })
-    .collect()
 }
 
 
