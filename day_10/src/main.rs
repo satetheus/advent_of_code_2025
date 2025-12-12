@@ -10,7 +10,7 @@ fn main() {
     let mut part2_total: usize = 0;
 
     for mut machine in parsed_input {
-        part1_total += get_minimum_buttons(&mut machine);
+        part1_total += get_min_buttons(&mut machine);
     }
 
     for mut machine in parsed_input_2 {
@@ -28,7 +28,7 @@ struct Machine {
     on_sequence: Vec<bool>,
     buttons: Vec<Vec<usize>>,
     joltage: Vec<usize>,
-    joltage_requirements: Vec<usize>,
+    joltage_reqs: Vec<usize>,
 }
 
 impl From<&String> for Machine {
@@ -38,7 +38,7 @@ impl From<&String> for Machine {
         lights_str.next();
         lights_str.next_back();
         let on_sequence: Vec<bool> = lights_str.map(|n| n == '#').collect();
-        let joltage_requirements: Vec<usize> = parsed_item
+        let joltage_reqs: Vec<usize> = parsed_item
             .pop()
             .expect("no joltage?")
             .split(',')
@@ -65,8 +65,8 @@ impl From<&String> for Machine {
             lights: vec![false; on_sequence.len()],
             on_sequence,
             buttons,
-            joltage: vec![0; joltage_requirements.len()],
-            joltage_requirements,
+            joltage: vec![0; joltage_reqs.len()],
+            joltage_reqs,
         }
     }
 }
@@ -93,18 +93,33 @@ impl Machine {
 
     fn reset(&mut self) {
         self.lights = vec![false; self.lights.len()];
-        self.joltage = vec![0; self.joltage_requirements.len()];
+        self.joltage = vec![0; self.joltage_reqs.len()];
+    }
+
+    fn buttons_for_jolts(&mut self) -> Vec<(usize, Vec<usize>)> {
+        let mut buttons_list: Vec<(usize, Vec<usize>)> = vec![];
+        for (j, jolts) in self.joltage_reqs.iter().enumerate() {
+            let mut jolts_buttons: Vec<usize> = vec![];
+            for (i, button) in self.buttons.iter().enumerate() {
+                if button.contains(&j) {
+                    jolts_buttons.push(i);
+                }
+            }
+            buttons_list.push((*jolts, jolts_buttons));
+        }
+
+        buttons_list
     }
 }
 
 
-fn get_minimum_buttons(machine: &mut Machine) -> usize {
+fn get_min_buttons(machine: &mut Machine) -> usize {
     machine.reset();
-    let mut minimum_buttons = 1;
+    let mut min_buttons = 1;
     let mut found = false;
 
     loop {
-        let combs = (0..machine.buttons.len()).combinations(minimum_buttons);
+        let combs = (0..machine.buttons.len()).combinations(min_buttons);
         for comb in combs {
             machine.reset();
             machine.press_buttons(comb);
@@ -115,39 +130,23 @@ fn get_minimum_buttons(machine: &mut Machine) -> usize {
         }
 
         if found { break }
-        if minimum_buttons >= 30 { break } //arbitrary
-        minimum_buttons += 1;
+        if min_buttons >= 30 { break } //arbitrary
+        min_buttons += 1;
     }
 
-    minimum_buttons
+    min_buttons
 }
 
 
 fn get_min_joltage_buttons(machine: &mut Machine) -> usize {
     machine.reset();
-    let mut minimum_buttons: usize = *machine.joltage_requirements.iter().max().expect("joltage issue");
-    let mut found = false;
+    let mut min_buttons: usize = *machine.joltage_reqs.iter().max().expect("joltage issue");
+    let mut _found = false;
     // todo! may base this on the minimum buttons needed for each joltage position instead?
 
-    loop {
-        let combs = (0..machine.buttons.len()).combinations_with_replacement(minimum_buttons);
-        dbg!(minimum_buttons);
-        for comb in combs {
-            machine.reset();
-            machine.press_joltage_buttons(comb);
-            if machine.joltage == machine.joltage_requirements {
-                dbg!("joltage found");
-                found = true;
-                break
-            }
-        }
+    let _max_jolts = machine.joltage_reqs.iter().position(|n| *n == min_buttons);
 
-        if found { break }
-        if minimum_buttons >= 300 { break } //arbitrary
-        minimum_buttons += 1;
-    }
-
-    minimum_buttons
+    min_buttons
 }
 
 
@@ -172,9 +171,16 @@ mod tests {
     }
 
     #[test]
-    fn test_get_minimum_buttons() {
+    fn test_buttons_for_jolts() {
+        let mut m1: Machine = (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
+        let buttons = vec![(3, vec![4,5]),(5, vec![1,5]), (4, vec![2,3,4]), (7, vec![0,1,3])];
+        assert_eq!(m1.buttons_for_jolts(), buttons);
+    }
+
+    #[test]
+    fn test_get_min_buttons() {
         let mut m1: Machine = (&"[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}".to_string()).into();
-        assert_eq!(get_minimum_buttons(&mut m1), 3);
+        assert_eq!(get_min_buttons(&mut m1), 3);
 
     }
 
