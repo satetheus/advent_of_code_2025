@@ -10,7 +10,7 @@ fn strings_to_points(input: Vec<String>) -> Vec<[i64; 2]> {
     input
         .iter()
         .map(|n| {
-            let a: vec<i64> = split_str!(n,",");
+            let a: Vec<i64> = split_str!(n,",");
                 a.try_into()
                 .expect("incorrect length")
         })
