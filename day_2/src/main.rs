@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use std::path::Path;
 use std::fs;
+use utils::split_str;
 
 
 fn main() {
@@ -22,7 +23,7 @@ fn process_file(filename: impl AsRef<Path>) -> Vec<Vec<i64>> {
 
     // Not proud of this nested closure. Something is probably wrong here
     // but the output is correct.
-    let lines: Vec<_> = contents.split(',').map(|n| n.to_string()).collect();
+    let lines: Vec<String> = split_str!(contents,',');
     let split_lines: Vec<Vec<_>> = lines.iter().map(|l|
         l.split('-').collect::<Vec<_>>().into_iter().map(|s|
             s.parse::<i64>().expect("error converting to number")

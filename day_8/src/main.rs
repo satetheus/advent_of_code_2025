@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use utils::process_file;
+use utils::{process_file, split_str};
 
 fn main() {
     let input = string_to_points(process_file("day_8_input.txt"));
@@ -11,12 +11,8 @@ fn string_to_points(input: Vec<String>) -> Vec<[i64; 3]> {
     input
         .iter()
         .map(|n| {
-            n.split(',')
-                // Clippy says that this can just be map. It cannot.
-                .filter_map(|i| Some(i.parse::<i64>().expect("not a number")))
-                .collect::<Vec<i64>>()
-                .try_into()
-                .expect("getting ridiculous")
+            let a: Vec<i64> = split_str!(n, ',');
+            a.try_into().expect("getting ridiculous")
         })
         .collect()
 }

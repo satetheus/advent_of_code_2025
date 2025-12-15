@@ -1,6 +1,5 @@
-use utils::process_file;
 use itertools::Itertools;
-
+use utils::{split_str, process_file};
 
 fn main() {
     let input = process_file("day_10_input.txt");
@@ -21,7 +20,6 @@ fn main() {
     println!("{:?}", part2_total);
 }
 
-
 #[derive(Debug)]
 struct Machine {
     lights: Vec<bool>,
@@ -33,32 +31,16 @@ struct Machine {
 
 impl From<&String> for Machine {
     fn from(item: &String) -> Self {
-        let mut parsed_item: Vec<String> = item.split_whitespace().map(String::from).collect();
+        let mut parsed_item: Vec<String> = split_str!(item);
         let mut lights_str = parsed_item[0].chars();
         lights_str.next();
         lights_str.next_back();
         let on_sequence: Vec<bool> = lights_str.map(|n| n == '#').collect();
-        let joltage_reqs: Vec<usize> = parsed_item
-            .pop()
-            .expect("no joltage?")
-            .split(',')
-            .map(|n| {
-                n.replace(['{', '}'], "")
-                    .parse::<usize>()
-                    .expect("not a number")
-            })
-            .collect();
-        let buttons = parsed_item[1..]
+        let joltage_reqs: Vec<usize> =
+            split_str!(parsed_item.pop().expect("no joltage?"), ',', ['{', '}']);
+        let buttons: Vec<Vec<usize>> = parsed_item[1..]
             .iter()
-            .map(|i| {
-                i.split(',')
-                    .map(|n| {
-                        n.replace(['(', ')'], "")
-                            .parse::<usize>()
-                            .expect("not a number")
-                    })
-                    .collect()
-            })
+            .map(|i| split_str!(i, ',', ['(', ')']))
             .collect();
 
         Machine {
@@ -70,7 +52,6 @@ impl From<&String> for Machine {
         }
     }
 }
-
 
 impl Machine {
     fn press_buttons(&mut self, buttons: Vec<usize>) {
@@ -112,7 +93,6 @@ impl Machine {
     }
 }
 
-
 fn get_min_buttons(machine: &mut Machine) -> usize {
     machine.reset();
     let mut min_buttons = 1;
@@ -125,18 +105,21 @@ fn get_min_buttons(machine: &mut Machine) -> usize {
             machine.press_buttons(comb);
             if machine.lights == machine.on_sequence {
                 found = true;
-                break
+                break;
             }
         }
 
-        if found { break }
-        if min_buttons >= 30 { break } //arbitrary
+        if found {
+            break;
+        }
+        if min_buttons >= 30 {
+            break;
+        } //arbitrary
         min_buttons += 1;
     }
 
     min_buttons
 }
-
 
 fn get_min_joltage_buttons(machine: &mut Machine) -> usize {
     machine.reset();
@@ -149,44 +132,52 @@ fn get_min_joltage_buttons(machine: &mut Machine) -> usize {
     min_buttons
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_press_button() {
-        let mut m1: Machine = (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
-        m1.press_buttons(vec![4,5]);
+        let mut m1: Machine =
+            (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
+        m1.press_buttons(vec![4, 5]);
         assert_eq!(m1.lights, m1.on_sequence);
     }
 
     #[test]
     fn test_reset() {
-        let mut m1: Machine = (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
-        m1.press_buttons(vec![4,5]);
-        m1.press_joltage_buttons(vec![2,3,4]);
+        let mut m1: Machine =
+            (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
+        m1.press_buttons(vec![4, 5]);
+        m1.press_joltage_buttons(vec![2, 3, 4]);
         m1.reset();
-        assert_eq!(m1.lights, vec![false;4]);
+        assert_eq!(m1.lights, vec![false; 4]);
     }
 
     #[test]
     fn test_buttons_for_jolts() {
-        let mut m1: Machine = (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
-        let buttons = vec![(3, vec![4,5]),(5, vec![1,5]), (4, vec![2,3,4]), (7, vec![0,1,3])];
+        let mut m1: Machine =
+            (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
+        let buttons = vec![
+            (3, vec![4, 5]),
+            (5, vec![1, 5]),
+            (4, vec![2, 3, 4]),
+            (7, vec![0, 1, 3]),
+        ];
         assert_eq!(m1.buttons_for_jolts(), buttons);
     }
 
     #[test]
     fn test_get_min_buttons() {
-        let mut m1: Machine = (&"[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}".to_string()).into();
+        let mut m1: Machine =
+            (&"[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}".to_string()).into();
         assert_eq!(get_min_buttons(&mut m1), 3);
-
     }
 
     #[test]
     fn test_get_min_joltage_buttons() {
-        let mut m1: Machine = (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
+        let mut m1: Machine =
+            (&"[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}".to_string()).into();
         assert_eq!(get_min_joltage_buttons(&mut m1), 10);
     }
 }

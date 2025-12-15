@@ -1,4 +1,4 @@
-use utils::process_file;
+use utils::{split_str, process_file};
 
 fn main() {
     let points = strings_to_points(process_file("day_9_input.txt"));
@@ -10,10 +10,8 @@ fn strings_to_points(input: Vec<String>) -> Vec<[i64; 2]> {
     input
         .iter()
         .map(|n| {
-            n.split(",")
-                .map(|i| i.parse().expect("not a number"))
-                .collect::<Vec<i64>>()
-                .try_into()
+            let a: vec<i64> = split_str!(n,",");
+                a.try_into()
                 .expect("incorrect length")
         })
         .collect()

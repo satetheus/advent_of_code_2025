@@ -1,4 +1,4 @@
-use utils::{process_file, transpose};
+use utils::{process_file, transpose, split_str};
 
 
 fn main() {
@@ -11,7 +11,7 @@ fn main() {
 
 
 fn do_operations(input: Vec<String>) -> i64 {
-    let parsed_input = input.iter().map(|n| n.split_whitespace().map(String::from).collect()).collect();
+    let parsed_input = input.iter().map(|n| split_str!(n)).collect();
     let pivot = transpose(parsed_input);
     let mut total = 0;
 
